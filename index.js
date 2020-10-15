@@ -127,6 +127,27 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
             res.send(document);
         })
     })
+
+    //ADMIN
+    const adminCollection = client.db("creativeAgency").collection("admin");
+
+    // Make admin
+    app.post("/addAdmin", (req, res) => {
+        const newAdmin = req.body;
+        console.log("newadmin:", newAdmin);
+        adminCollection.insertOne(newAdmin)
+            .then(result => {
+                console.log("result:", result);
+            })
+    })
+
+    app.post('/isAdmin', (req, res) => {
+        const email = req.body.email;
+        adminCollection.find({ email: email })
+            .toArray((err, admin) => {
+                res.send(admin.length > 0);
+            })
+    })
 });
 
 app.get("/", (req, res) => {
