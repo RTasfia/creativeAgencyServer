@@ -4,6 +4,8 @@ const bodyParser = require("body-parser");
 const app = express();
 
 const fileUpload = require('express-fileupload');
+const ObjectID = require('mongodb').ObjectID;
+
 var MongoClient = require('mongodb').MongoClient;
 
 require('dotenv').config();
@@ -24,10 +26,10 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
     // insert all serices to db
     app.post("/allService", (req, res) => {
         const newService = req.body;
-        console.log("newservice:", newService);
+        console.log(newService);
         serviceCollection.insertMany(newService)
             .then(result => {
-                console.log("result:", result);
+                console.log(result);
             })
     })
     console.log("done");
@@ -45,9 +47,9 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
         const file = req.files.file;
         const title = req.body.title;
         const description = req.body.description;
-        console.log("file", file);
-        console.log("title",title);
-        console.log("description",description);
+        console.log(file);
+        console.log(title);
+        console.log(description);
         const newImg = file.data;
         const encImg = newImg.toString('base64');
 
@@ -64,6 +66,7 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
     })
 
 
+
     // REVIEW
 
     const reviewCollection = client.db("creativeAgency").collection("review");
@@ -71,28 +74,28 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
     // Add all review
     app.post("/allReview", (req, res) => {
         const newReview = req.body;
-        console.log("newReview", newReview);
+        console.log(newReview);
         reviewCollection.insertMany(newReview)
             .then(result => {
-                console.log("result", result);
+                console.log(result);
             })
     })
 
     // Show all review
     app.get("/reviews", (req, res) => {
-        reviewCollection.find({})
+        reviewCollection.find({}).limit(6)
             .toArray((err, document) => {
                 res.send(document);
             })
     })
-    
+
     // add review
     app.post("/addReview", (req, res) => {
         const newReview = req.body;
-        console.log("newReview", newReview);
+        console.log(newReview);
         reviewCollection.insertOne(newReview)
             .then(result => {
-                console.log("result", result);
+                console.log(result);
             })
     })
 
@@ -107,7 +110,7 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
         console.log(newCustomer);
         customerCollection.insertOne(newCustomer)
             .then(result => {
-                console.log("result", result);
+                console.log(result);
             })
     })
 
@@ -121,11 +124,25 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
     })
 
     // Show all customer
-    app.get("/allCustomer", (req,res)=> {
+    app.get("/allCustomer", (req, res) => {
         customerCollection.find({})
-        .toArray((err, document) => {
-            res.send(document);
-        })
+            .toArray((err, document) => {
+                res.send(document);
+            })
+    })
+    // Update Status
+    app.post("/updateStatus", (req, res) => {
+        const newStatus = req.body;
+        const id = req.body.id;
+        const status = req.body.status;
+        console.log(newStatus, id, status);
+        customerCollection.updateOne(
+            { _id: ObjectID(id) },
+            { $set: { status: `${status}` } },
+            { upsert: true })
+            .then(result => {
+                console.log(result);
+            })
     })
 
     //ADMIN
@@ -134,10 +151,10 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
     // Make admin
     app.post("/addAdmin", (req, res) => {
         const newAdmin = req.body;
-        console.log("newadmin:", newAdmin);
+        console.log(newAdmin);
         adminCollection.insertOne(newAdmin)
             .then(result => {
-                console.log("result:", result);
+                console.log(result);
             })
     })
 
