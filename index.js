@@ -167,7 +167,5 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, fu
     })
 });
 
-app.get("/", (req, res) => {
-    res.send("listening");
-})
+
 app.listen(process.env.PORT || 5000);
